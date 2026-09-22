@@ -1,0 +1,6 @@
+{
+  "name": "三義鄉公所勤休制度加班時數篩選系統",
+  "description": "專為三義鄉公所人事差勤休制度設計的加班時數統計分析與篩選工具，支援Excel/CSV上傳、客製化時數篩選（如單月加班達60小時以上）、員工編號名冊篩選與資料匯出下載。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

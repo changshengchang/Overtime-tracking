@@ -14,6 +14,7 @@ import {
   ChevronRight,
   Sparkles,
   RotateCcw,
+  UserCheck,
 } from 'lucide-react';
 import {
   AttendanceRecord,
@@ -149,6 +150,35 @@ export const DataTable: React.FC<DataTableProps> = ({
     exportFilteredDataToCsv(sortedRecords, originalColumns, filterConfig, nameCol, employeeIdCol);
   };
 
+  // 依使用者最新指示：增加功能「下載篩選清冊(依選取人員類別)」，僅將已亮起類別之人員作下載 (不含其他未選取之人員類別)
+  const isCategorySelected = Boolean(highlightedCategory && highlightedCategory !== 'all');
+
+  const categoryFilteredRecords = useMemo(() => {
+    if (!isCategorySelected) return [];
+    return sortedRecords.filter((r) => {
+      const recordCat = (r.title || '').trim() || '正式人員';
+      return recordCat === highlightedCategory;
+    });
+  }, [sortedRecords, isCategorySelected, highlightedCategory]);
+
+  const handleCategoryExcelExport = () => {
+    if (!isCategorySelected || categoryFilteredRecords.length === 0) {
+      alert('目前尚未選取或無符合該類別之人員可供下載');
+      return;
+    }
+    const prefix = `三義鄉公所勤休清冊_${highlightedCategory}`;
+    exportFilteredDataToExcel(categoryFilteredRecords, originalColumns, filterConfig, nameCol, employeeIdCol, prefix);
+  };
+
+  const handleCategoryCsvExport = () => {
+    if (!isCategorySelected || categoryFilteredRecords.length === 0) {
+      alert('目前尚未選取或無符合該類別之人員可供下載');
+      return;
+    }
+    const prefix = `三義鄉公所勤休清冊_${highlightedCategory}`;
+    exportFilteredDataToCsv(categoryFilteredRecords, originalColumns, filterConfig, nameCol, employeeIdCol, prefix);
+  };
+
   // 依要求：排除姓名與附件二所載無須呈現之欄位
   const remainingColumns = useMemo(() => {
     return originalColumns.filter((col) => {
@@ -225,6 +255,31 @@ export const DataTable: React.FC<DataTableProps> = ({
                 </span>
               )}
             </button>
+
+            {/* 依使用者指示：提供依選取人員類別的 Excel 版 與 CSV 版 獨立按鈕供下載選擇 */}
+            {isCategorySelected && (
+              <>
+                <button
+                  type="button"
+                  onClick={handleCategoryExcelExport}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold shadow-xs transition cursor-pointer border border-amber-500"
+                  title={`僅匯出已亮起之「${highlightedCategory}」人員清冊為 Excel 檔案 (.xlsx，共 ${categoryFilteredRecords.length} 筆，不含其他未選取人員類別)`}
+                >
+                  <FileSpreadsheet className="w-4 h-4 text-amber-200" />
+                  <span>下載篩選清冊 (依選取人員類別: {highlightedCategory} 共{categoryFilteredRecords.length}員) (Excel)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleCategoryCsvExport}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-amber-700 hover:bg-amber-600 text-white text-xs font-semibold shadow-xs transition cursor-pointer border border-amber-600"
+                  title={`僅匯出已亮起之「${highlightedCategory}」人員清冊為 CSV 檔案 (.csv，共 ${categoryFilteredRecords.length} 筆，不含其他未選取人員類別)`}
+                >
+                  <Download className="w-4 h-4 text-amber-200" />
+                  <span>下載篩選清冊 (依選取人員類別: {highlightedCategory}) (CSV)</span>
+                </button>
+              </>
+            )}
 
             <button
               type="button"

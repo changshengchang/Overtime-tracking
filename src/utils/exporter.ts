@@ -179,6 +179,7 @@ export function exportFilteredDataToCsv(
   // 依要求 2 & 3：刪除附件二各項欄位與姓名，保留其他原始欄位，並保留「勤休系統篩選註記」
   const rowsToExport = validRecords.map((record) => {
     const row: Record<string, any> = {};
+
     for (const col of originalColumns) {
       if (shouldOmitColumnFromExport(col, nameCol)) continue;
       row[col] = record.rawRow[col] ?? '';

@@ -38,7 +38,7 @@ export const Header: React.FC<HeaderProps> = ({
                 三義鄉公所勤休制度加班時數篩選系統
               </h1>
               <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-                依據公務員服務法及行政院所屬機關勤休召集要點，精準篩選單月超時列管同仁名冊與導出審查清冊
+                依據公務員服務法及行政院與所屬中央及地方各機關（構）公務員服勤實施辦法，精準篩選單月超時列管同仁名冊與導出審查清冊
               </p>
             </div>
           </div>

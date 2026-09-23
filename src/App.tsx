@@ -14,7 +14,7 @@ import { DataTable } from './components/DataTable';
 import { RegulationGuideModal } from './components/RegulationGuideModal';
 import { AttendanceRecord, ColumnMapping, DepartmentStat, FilterConfig } from './types';
 import { parseSpreadsheetBuffer, guessColumnMapping } from './utils/parser';
-import { SANYI_SAMPLE_DATA } from './utils/sampleData';
+import { SANYI_SAMPLE_DATA, buildSanyiOfficialTemplateSheet } from './utils/sampleData';
 
 export default function App() {
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
@@ -48,12 +48,12 @@ export default function App() {
   const loadSampleDataset = () => {
     setIsLoading(true);
     try {
-      const ws = XLSX.utils.json_to_sheet(SANYI_SAMPLE_DATA);
+      const ws = buildSanyiOfficialTemplateSheet(true);
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, '三義鄉公所出勤總表');
+      XLSX.utils.book_append_sheet(wb, ws, '苗栗縣三義鄉公所加班時數統計報表');
       const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
 
-      const parsed = parseSpreadsheetBuffer(wbout, '三義鄉公所113年差勤與加班時數統計表(示範).xlsx');
+      const parsed = parseSpreadsheetBuffer(wbout, '苗栗縣三義鄉公所加班時數統計報表(示範).xlsx');
       setRecords(parsed.records);
       setOriginalColumns(parsed.columns);
       setMapping(parsed.mapping);

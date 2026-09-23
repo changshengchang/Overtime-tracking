@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { UploadCloud, FileSpreadsheet, Download, RefreshCw, CheckCircle2, SlidersHorizontal, Sparkles } from 'lucide-react';
+import { UploadCloud, FileSpreadsheet, Download, RefreshCw, CheckCircle2, SlidersHorizontal, Sparkles, Info } from 'lucide-react';
 import { ColumnMapping } from '../types';
 import { downloadSampleExcelTemplate, downloadSampleCsvTemplate } from '../utils/sampleData';
 
@@ -211,7 +211,25 @@ export const FileUploadSection: React.FC<FileUploadSectionProps> = ({
               <p className="text-xs text-slate-500 mt-1">
                 點擊此處瀏覽，或將 Excel (.xlsx, .xls) / CSV 檔案拖曳至此處
               </p>
-              <div className="mt-3 flex items-center gap-2 text-[11px] text-slate-400 bg-slate-100/80 px-3 py-1 rounded-full">
+
+              {/* 依要求 2：明顯之標記及不同顏色方式呈現 Webitr 下載路徑與欄位說明 */}
+              <div className="mt-4 max-w-xl w-full bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border-2 border-amber-300/80 rounded-xl px-4 py-3 shadow-xs text-left">
+                <div className="flex items-start gap-2.5">
+                  <div className="p-1.5 bg-amber-500 text-white rounded-md shrink-0 mt-0.5 shadow-xs">
+                    <Info className="w-4 h-4 stroke-[2.5]" />
+                  </div>
+                  <div className="text-xs text-amber-950 leading-relaxed font-medium">
+                    <span className="font-bold text-amber-900 bg-amber-100/80 px-1.5 py-0.5 rounded border border-amber-200 inline-block mb-1">
+                      💡 公所同仁系統操作提示
+                    </span>
+                    <p className="text-amber-900 text-xs sm:text-[13px] font-semibold">
+                      上傳之檔案可由【<span className="text-amber-700 underline underline-offset-2 decoration-amber-400 font-bold">Webitr/差勤/報表統計/加班時數統計報表</span>】之路徑下載，再刪除「<span className="text-rose-600 font-bold bg-rose-50 px-1 rounded border border-rose-200">姓名</span>」欄位即可導出與範本一致之格式
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 flex items-center gap-2 text-[11px] text-slate-400 bg-slate-100/80 px-3 py-1 rounded-full flex-wrap justify-center">
                 <span>自動偵測表頭與時數欄位</span>
                 <span>•</span>
                 <span>時數欄位內看似數字之文字均自動轉換統計</span>

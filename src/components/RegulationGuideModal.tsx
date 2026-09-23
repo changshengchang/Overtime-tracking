@@ -25,7 +25,7 @@ export const RegulationGuideModal: React.FC<RegulationGuideModalProps> = ({
                 三義鄉公所勤休制度法規依據與操作說明
               </h3>
               <p className="text-xs text-slate-500">
-                公務人員服務法第12條及行政院所屬各級行政機關公務人員勤休規定要點
+                公務員服務法及行政院與所屬中央及地方各機關（構）公務員服勤實施辦法
               </p>
             </div>
           </div>
@@ -52,7 +52,7 @@ export const RegulationGuideModal: React.FC<RegulationGuideModalProps> = ({
                 <strong>專案上限（80小時）：</strong> 機關因業務特殊需要（如防汛、颱風災害應變、重大藝文專案活動等），經主管機關核定者，每月份延長辦公時數得放寬至80小時。
               </li>
               <li>
-                <strong>連續上班限制：</strong> 連續上班日數以不逾14日為原則，且更換班次時應有連續11小時之休息時間。
+                <strong>連續上班限制：</strong> 有急迫必要性，且機關（構）人力臨時調度有困難，不受每日辦公時數上限 14 小時之限制，惟不得連續超過3日
               </li>
               <li>
                 <strong>人事列管查核：</strong> 各主管課室及人事室應於每月彙整同仁出勤時數，針對達60小時以上者進行關懷列管與業務分工調整。

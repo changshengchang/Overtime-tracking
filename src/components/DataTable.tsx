@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
+  RotateCcw,
 } from 'lucide-react';
 import {
   AttendanceRecord,
@@ -49,14 +50,23 @@ export const DataTable: React.FC<DataTableProps> = ({
   highlightedCategory = 'all',
   onClearHighlightedCategory,
 }) => {
-  const [sortColumn, setSortColumn] = useState<string>('overtimeHours');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [sortColumn, setSortColumn] = useState<string>('original');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(20);
   const [selectedRecordForDetail, setSelectedRecordForDetail] = useState<AttendanceRecord | null>(null);
 
   // Sorting
   const sortedRecords = useMemo(() => {
+    if (sortColumn === 'original') {
+      // 依使用者指示：按原來排序 (以原始檔案上傳時之列順序為基準)
+      return [...filteredRecords].sort((a, b) => {
+        const idxA = a.originalIndex ?? 0;
+        const idxB = b.originalIndex ?? 0;
+        return sortDirection === 'asc' ? idxA - idxB : idxB - idxA;
+      });
+    }
+
     return [...filteredRecords].sort((a, b) => {
       let valA: any;
       let valB: any;
@@ -103,6 +113,20 @@ export const DataTable: React.FC<DataTableProps> = ({
   }, [sortedRecords, currentPage, pageSize]);
 
   const handleSort = (column: string) => {
+    if (column === 'overtimeHours') {
+      // 針對加班總時數欄位：降序 (高到低) -> 升序 (低到高) -> 按原來排序 (與原始檔案參照) 循環切換
+      if (sortColumn === 'overtimeHours' && sortDirection === 'desc') {
+        setSortDirection('asc');
+      } else if (sortColumn === 'overtimeHours' && sortDirection === 'asc') {
+        setSortColumn('original');
+        setSortDirection('asc');
+      } else {
+        setSortColumn('overtimeHours');
+        setSortDirection('desc');
+      }
+      return;
+    }
+
     if (sortColumn === column) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
@@ -111,12 +135,18 @@ export const DataTable: React.FC<DataTableProps> = ({
     }
   };
 
+  // 一鍵切換或重置為「按原來排序」
+  const handleResetToOriginalOrder = () => {
+    setSortColumn('original');
+    setSortDirection('asc');
+  };
+
   const handleExcelExport = () => {
-    exportFilteredDataToExcel(filteredRecords, originalColumns, filterConfig, nameCol, employeeIdCol);
+    exportFilteredDataToExcel(sortedRecords, originalColumns, filterConfig, nameCol, employeeIdCol);
   };
 
   const handleCsvExport = () => {
-    exportFilteredDataToCsv(filteredRecords, originalColumns, filterConfig, nameCol, employeeIdCol);
+    exportFilteredDataToCsv(sortedRecords, originalColumns, filterConfig, nameCol, employeeIdCol);
   };
 
   // 依要求：排除姓名與附件二所載無須呈現之欄位
@@ -174,14 +204,34 @@ export const DataTable: React.FC<DataTableProps> = ({
             </p>
           </div>
 
-          {/* Download Buttons */}
+          {/* Download & Sort Buttons */}
           <div className="flex items-center gap-2 flex-wrap">
+            {/* 依使用者指示：增加「按原來排序」按鈕以利與原始檔案參照 */}
+            <button
+              type="button"
+              onClick={handleResetToOriginalOrder}
+              className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border transition cursor-pointer ${
+                sortColumn === 'original'
+                  ? 'bg-amber-100 text-amber-900 border-amber-300 shadow-2xs font-semibold'
+                  : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-300'
+              }`}
+              title="依原始上傳檔案之原本行順序排序，以利與原始公所檔案逐筆對照參照"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-amber-700" />
+              <span>按原來排序</span>
+              {sortColumn === 'original' && (
+                <span className="ml-0.5 px-1.5 py-0.2 rounded bg-amber-200 text-amber-800 text-[10px]">
+                  作用中
+                </span>
+              )}
+            </button>
+
             <button
               type="button"
               onClick={handleExcelExport}
               disabled={filteredRecords.length === 0}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-600 disabled:bg-slate-300 text-white text-xs font-semibold shadow-xs transition cursor-pointer disabled:cursor-not-allowed"
-              title="將篩選出的所有員工差勤資料匯出為 Excel 檔案 (.xlsx，依規範自動刪除員工姓名欄位)"
+              title="將篩選出的所有員工差勤資料匯出為 Excel 檔案 (.xlsx，依目前排序並自動刪除員工姓名欄位)"
             >
               <FileSpreadsheet className="w-4 h-4 text-emerald-200" />
               <span>下載篩選清冊 (Excel)</span>
@@ -192,7 +242,7 @@ export const DataTable: React.FC<DataTableProps> = ({
               onClick={handleCsvExport}
               disabled={filteredRecords.length === 0}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:bg-slate-300 text-white text-xs font-semibold shadow-xs transition cursor-pointer disabled:cursor-not-allowed"
-              title="將篩選出的所有員工差勤資料匯出為 CSV 檔案 (.csv，依規範自動刪除員工姓名欄位)"
+              title="將篩選出的所有員工差勤資料匯出為 CSV 檔案 (.csv，依目前排序並自動刪除員工姓名欄位)"
             >
               <Download className="w-4 h-4 text-slate-300" />
               <span>下載篩選清冊 (CSV)</span>
@@ -269,14 +319,27 @@ export const DataTable: React.FC<DataTableProps> = ({
 
               <th
                 onClick={() => handleSort('overtimeHours')}
-                className="py-3 px-3.5 cursor-pointer hover:bg-slate-200/70 transition text-right bg-amber-50/60 font-bold"
+                className="py-3 px-3.5 cursor-pointer hover:bg-slate-200/70 transition text-right bg-amber-50/60 font-bold group select-none"
+                title="點擊切換：時數高到低 ↓ / 時數低到高 ↑ / 按原來排序 ↺"
               >
-                <div className="flex items-center justify-end gap-1">
+                <div className="flex items-center justify-end gap-1.5">
                   <span>加班總時數 (h)</span>
                   {sortColumn === 'overtimeHours' ? (
-                    sortDirection === 'asc' ? <ArrowUp className="w-3.5 h-3.5 text-amber-600" /> : <ArrowDown className="w-3.5 h-3.5 text-amber-600" />
+                    sortDirection === 'asc' ? (
+                      <span className="inline-flex items-center gap-0.5 text-amber-700 bg-amber-100 px-1 rounded text-[10px]">
+                        低至高 <ArrowUp className="w-3 h-3" />
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-0.5 text-amber-700 bg-amber-100 px-1 rounded text-[10px]">
+                        高至低 <ArrowDown className="w-3 h-3" />
+                      </span>
+                    )
+                  ) : sortColumn === 'original' ? (
+                    <span className="inline-flex items-center gap-0.5 text-slate-500 bg-slate-100 px-1 rounded text-[10px] font-normal" title="目前依原始上傳檔案順序排序">
+                      按原來排序 <RotateCcw className="w-2.5 h-2.5" />
+                    </span>
                   ) : (
-                    <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                    <ArrowUpDown className="w-3 h-3 text-slate-400 group-hover:text-slate-600" />
                   )}
                 </div>
               </th>

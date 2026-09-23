@@ -497,6 +497,7 @@ export function parseSpreadsheetBuffer(
       paidOvertimeHours: paidHours,
       notes,
       rawRow: row,
+      originalIndex: index + 1,
     };
   });
 

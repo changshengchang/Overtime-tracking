@@ -12,6 +12,7 @@ export interface AttendanceRecord {
   paidOvertimeHours?: number; // 支領加班費時數
   notes?: string; // 備註 (專案核准等)
   rawRow: Record<string, any>; // 所有原始欄位資料
+  originalIndex?: number; // 原始試算表中出現之順序 (1-based)，用於「按原來排序」
 }
 
 export type FilterOperator = '>=' | '>' | '<=' | '<' | '==' | 'between';
